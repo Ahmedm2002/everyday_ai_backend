@@ -9,9 +9,10 @@ import { corsOptions } from "./src/configs/cors.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+const port = process.env.PORT || 5000;
 
 connectDb();
 
