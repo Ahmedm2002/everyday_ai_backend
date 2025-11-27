@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: .
+    container_name: chatbot_backend
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    networks:
+      - chatbot
+    ports:
+      - 3000:3000
+
+networks:
+  - chatbot
