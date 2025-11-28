@@ -14,7 +14,7 @@ class API_RES {
     this.isExecutionSuccess = isExecutionSuccess;
     this.statusCode = statusCode;
     this.message = message;
-    this.success = statusCode < 400;
+    this.success = statusCode < 400 && statusCode != 409;
     this.errors = errors;
     this.data = data;
     this.req = req;

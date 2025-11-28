@@ -1,7 +1,11 @@
 import express from "express";
-import generatePrompt from "../controllers/chat.controller.js";
+import {
+  generatePrompt,
+  chatMessages,
+} from "../controllers/chat.controller.js";
 const router = express.Router();
 
 router.post("/prompt", generatePrompt);
+router.get("/chat/:id", chatMessages);
 
 export default router;
