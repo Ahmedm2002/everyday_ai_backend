@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 
-const messegeSchema = new mongoose.Schema({
-  role: String,
-  content: String,
-});
-
 const chatSchema = new mongoose.Schema(
   {
-    userId: String,
-    messages: [messegeSchema],
+    user_id: String,
+    messages: [
+      {
+        user: String,
+        bot: String,
+      },
+    ],
   },
   { timestamps: true }
 );

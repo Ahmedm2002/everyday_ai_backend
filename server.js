@@ -8,6 +8,14 @@ dotenv.config({
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
-  console.log(`Server Started on http://localhost:${port}`);
-});
+console.log(connectDb);
+
+connectDb()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server Started on http://localhost:${port}`);
+    });
+  })
+  .catch((e) => {
+    console.log("Error Connecting with database: ", e);
+  });

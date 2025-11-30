@@ -68,7 +68,7 @@ class API_RES {
         Stack: ${JSON.stringify(this.errorStack?.stack)} 
       `;
       fs.appendFile(logFile, errorLog, (err) => {
-        console.log("Error appending error in logs file");
+        console.log("Error appending error in logs file", err);
       });
     } catch (e) {
       console.log("Error occured while logging error", e);

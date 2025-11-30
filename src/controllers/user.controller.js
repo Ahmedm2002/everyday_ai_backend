@@ -5,8 +5,9 @@ import CONSTANTS from "../constants.js";
 import { isValidObjectId } from "mongoose";
 import ChatModel from "../models/chat.model.js";
 
-SERVER_ERR = CONSTANTS.API_ERRORS.SERVER_ERR;
-SERVER_MSG = CONSTANTS.API_ERRORS.SERVER_MSG;
+const SERVER_ERR = CONSTANTS.API_ERRORS.SERVER_ERR;
+const SERVER_MSG = CONSTANTS.API_ERRORS.SERVER_MSG;
+const saltRounds = 10;
 
 async function registerUser(req, res) {
   const { firstName, lastName, email, password } = req.body;
@@ -21,13 +22,14 @@ async function registerUser(req, res) {
       );
   }
   try {
+    const hashedPassword = bcrypt.hash(password, saltRounds);
     let user = await UserModel.findOne({ email });
     if (!user) {
       user = await UserModel.insertOne({
         firstName,
         lastName,
         email,
-        password,
+        password: hashedPassword,
       });
       return res
         .status(201)
@@ -68,6 +70,16 @@ async function loginUser(req, res) {
           ])
         );
     }
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatched) {
+      return res
+        .status(400)
+        .json(
+          new API_RES(true, 400, "Wrong Password, Try again", null, [
+            "Wrong Password",
+          ])
+        );
+    }
     return res
       .status(200)
       .json(new API_RES(true, 200, "Login Successfull", user, null));
@@ -97,7 +109,7 @@ async function allChats(req, res) {
           new API_RES(true, 404, "User not found", null, ["No user found"])
         );
     }
-    const userChats = await ChatModel.find({ userId: user_id });
+    const userChats = await ChatModel.find({ user_id });
 
     if (!userChats) {
       return res

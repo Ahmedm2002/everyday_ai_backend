@@ -1,18 +1,42 @@
 import { AI, default_prompt } from "../configs/ai_bot.js";
 import ChatModel from "../models/chat.model.js";
 import API_RES from "../utils/ApiRes.js";
+import validateFields from "../utils/validation.js";
 
 const generatePrompt = async function (req, res) {
-  const { userPrompt } = req.body;
+  const { userPrompt, user_id } = req.body;
+  const { chatId } = req.params.id;
+
+  const errors = validateFields({ user_id, chatId, userPrompt });
+  if (errors.length > 0) {
+    return res
+      .status(400)
+      .json(new API_RES(true, 400, "Missing Fields", null, errors));
+  }
+
   try {
     const query = `${default_prompt} ${userPrompt}`;
-
-    console.log("AI: ", AI);
 
     const response = await AI.models.generateContent({
       model: "gemini-2.0-flash-001",
       contents: query,
     });
+
+    const botReply = response.candidates[0].content.parts[0].text;
+
+    const chat = await ChatModel.findOne({ _id: chatId });
+
+    if (!chat) {
+      await ChatModel.insertOne({
+        user_id,
+        messages: [
+          {
+            user: query,
+            bot: botReply,
+          },
+        ],
+      });
+    }
 
     return res.json({ botReply: response.candidates[0].content.parts[0].text });
   } catch (error) {
