@@ -40,6 +40,7 @@ class API_RES {
 
   reportError() {
     try {
+      console.log(this.req);
       const logsDir = path.join(process.cwd(), "logs");
       if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
@@ -62,7 +63,6 @@ class API_RES {
         Params: ${JSON.stringify(this.req?.params)},
         Query: ${JSON.stringify(this.req?.query)},
         Ip: ${this.req?.ip},
-        User Agent: ${this.req?.get("user-agent")},
         Request Headers : ${JSON.stringify(this.req?.headers)}
 
         Stack: ${JSON.stringify(this.errorStack?.stack)} 

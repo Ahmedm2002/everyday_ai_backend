@@ -4,6 +4,7 @@ import validateFields from "../utils/validation.js";
 import CONSTANTS from "../constants.js";
 import { isValidObjectId } from "mongoose";
 import ChatModel from "../models/chat.model.js";
+import bcrypt from "bcryptjs";
 
 const SERVER_ERR = CONSTANTS.API_ERRORS.SERVER_ERR;
 const SERVER_MSG = CONSTANTS.API_ERRORS.SERVER_MSG;
@@ -22,7 +23,7 @@ async function registerUser(req, res) {
       );
   }
   try {
-    const hashedPassword = bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
     let user = await UserModel.findOne({ email });
     if (!user) {
       user = await UserModel.insertOne({
@@ -92,9 +93,10 @@ async function loginUser(req, res) {
   }
 }
 async function allChats(req, res) {
-  const { user_id } = req.params.user_id;
+  const { user_id } = req.params;
+
   try {
-    if (!isValidObjectId(chatId)) {
+    if (!isValidObjectId(user_id)) {
       res
         .status(400)
         .json(

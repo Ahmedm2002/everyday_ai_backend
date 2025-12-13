@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/chats/:id", allChats);
+router.get("/chats/:user_id", allChats);
 
 export default router;

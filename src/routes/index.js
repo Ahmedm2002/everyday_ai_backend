@@ -1,12 +1,15 @@
 import API_RES from "../utils/ApiRes.js";
 import chatRoutes from "./chat.routes.js";
 import userRoutes from "./user.routes.js";
+import authRouter from "./auth.routes.js";
+
 import { Router } from "express";
 
 const router = Router();
 
 router.use("/chat", chatRoutes);
 router.use("/user", userRoutes);
+router.use("/auth", authRouter);
 
 router.get("/health-check", (req, res) => {
   return res.status(200).json(

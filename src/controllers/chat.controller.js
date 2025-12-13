@@ -2,12 +2,15 @@ import { AI, default_prompt } from "../configs/ai_bot.js";
 import ChatModel from "../models/chat.model.js";
 import API_RES from "../utils/ApiRes.js";
 import validateFields from "../utils/validation.js";
+import CONSTANTS from "../constants.js";
+
+const SERVER_ERR = CONSTANTS.API_ERRORS.SERVER_ERR;
+const SERVER_MSG = CONSTANTS.API_ERRORS.SERVER_MSG;
 
 const generatePrompt = async function (req, res) {
-  const { userPrompt, user_id } = req.body;
-  const { chatId } = req.params.id;
+  const { userPrompt, user_id, chatId } = req.body;
 
-  const errors = validateFields({ user_id, chatId, userPrompt });
+  const errors = validateFields({ user_id, userPrompt });
   if (errors.length > 0) {
     return res
       .status(400)
@@ -17,31 +20,67 @@ const generatePrompt = async function (req, res) {
   try {
     const query = `${default_prompt} ${userPrompt}`;
 
-    const response = await AI.models.generateContent({
-      model: "gemini-2.0-flash-001",
-      contents: query,
-    });
+    // const response = await AI.models.generateContent({
+    //   model: "gemini-2.0-flash-001",
+    //   contents: query,
+    // });
 
-    const botReply = response.candidates[0].content.parts[0].text;
+    // const botReply = response.candidates[0].content.parts[0].text;
+    const botReply = "Dummy response : " + Date.now();
 
-    const chat = await ChatModel.findOne({ _id: chatId });
+    let chat;
 
-    if (!chat) {
-      await ChatModel.insertOne({
+    if (!chatId) {
+      chat = await ChatModel.create({
         user_id,
         messages: [
           {
-            user: query,
+            user: userPrompt,
             bot: botReply,
           },
         ],
       });
+    } else {
+      chat = await ChatModel.findByIdAndUpdate(
+        chatId,
+        {
+          $push: {
+            messages: {
+              user: userPrompt,
+              bot: botReply,
+            },
+          },
+        },
+        { new: true }
+      );
+
+      if (!chat) {
+        return res
+          .status(404)
+          .json(
+            new API_RES(true, 404, "Chat not found", null, ["Invalid chatId"])
+          );
+      }
     }
 
-    return res.json({ botReply: response.candidates[0].content.parts[0].text });
+    return res.status(200).json(
+      new API_RES(
+        true,
+        200,
+        "Bot reply generated successfully",
+        {
+          chatId: chat._id,
+          botReply,
+        },
+        []
+      )
+    );
   } catch (error) {
-    console.log("Error: ", error);
-    return res.status(500).json({ "Error: ": error, message: error.message });
+    return res
+      .status(500)
+      .json(
+        new API_RES(false, 500, SERVER_MSG, null, [SERVER_ERR], error, req)
+      );
   }
 };
 
