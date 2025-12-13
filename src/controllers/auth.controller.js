@@ -16,7 +16,7 @@ async function verfiyJwt(req, res) {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await UserModel.findById(decoded.userId).select("-password");
+        const user = await UserModel.findById(decoded.userId).select("-password, -originalPassword");
 
         if (!user) {
             return res

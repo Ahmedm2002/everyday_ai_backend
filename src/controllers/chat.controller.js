@@ -20,13 +20,13 @@ const generatePrompt = async function (req, res) {
   try {
     const query = `${default_prompt} ${userPrompt}`;
 
-    // const response = await AI.models.generateContent({
-    //   model: "gemini-2.0-flash-001",
-    //   contents: query,
-    // });
+    const response = await AI.models.generateContent({
+      model: "gemini-2.0-flash-001",
+      contents: query,
+    });
 
-    // const botReply = response.candidates[0].content.parts[0].text;
-    const botReply = "Dummy response : " + Date.now();
+    const botReply = response.candidates[0].content.parts[0].text;
+    // const botReply = "Dummy response : " + Date.now();
 
     let chat;
 
