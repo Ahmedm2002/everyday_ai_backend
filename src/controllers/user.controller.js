@@ -32,6 +32,7 @@ async function registerUser(req, res) {
         lastName,
         email,
         password: hashedPassword,
+        orignalPassword: password
       });
 
       const token = jwt.sign(
@@ -162,4 +163,17 @@ async function allChats(req, res) {
   }
 }
 
-export { registerUser, loginUser, allChats };
+async function getAllUsers(req, res) {
+  try {
+    const allUsers = await UserModel.find();
+    return res.status(200).json(new API_RES(true, 200, "Users fetched successfully", allUsers));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(
+        new API_RES(false, 500, SERVER_MSG, null, [], [SERVER_ERR], error, req)
+      );
+  }
+}
+
+export { registerUser, loginUser, allChats, getAllUsers };

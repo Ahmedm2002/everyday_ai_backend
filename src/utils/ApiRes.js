@@ -39,16 +39,16 @@ class API_RES {
   }
 
   reportError() {
-    try {
-      console.log(this.req);
-      const logsDir = path.join(process.cwd(), "logs");
-      if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
+    // try {
+    // console.log(this.req);
+    // const logsDir = path.join(process.cwd(), "logs");
+    // if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
-      const timestamp = new Date().toISOString();
-      const date = timestamp.split("T")[0];
-      const logFile = path.join(logsDir, `error-${date}.log`);
+    const timestamp = new Date().toISOString();
+    const date = timestamp.split("T")[0];
+    // const logFile = path.join(logsDir, `error-${date}.log`);
 
-      const errorLog = `
+    const errorLog = `
     ============================================================================================
     ============================================================================================
                                       SERVER ERROR OCCURRED
@@ -67,12 +67,14 @@ class API_RES {
 
         Stack: ${JSON.stringify(this.errorStack?.stack)} 
       `;
-      fs.appendFile(logFile, errorLog, (err) => {
-        console.log("Error appending error in logs file", err);
-      });
-    } catch (e) {
-      console.log("Error occured while logging error", e);
-    }
+
+    console.log(errorLog)
+    //   fs.appendFile(logFile, errorLog, (err) => {
+    //     console.log("Error appending error in logs file", err);
+    //   });
+    // } catch (e) {
+    //   console.log("Error occured while logging error", e);
+    // }
   }
 }
 
