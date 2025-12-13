@@ -5,6 +5,7 @@ import CONSTANTS from "../constants.js";
 import { isValidObjectId } from "mongoose";
 import ChatModel from "../models/chat.model.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const SERVER_ERR = CONSTANTS.API_ERRORS.SERVER_ERR;
 const SERVER_MSG = CONSTANTS.API_ERRORS.SERVER_MSG;
@@ -26,19 +27,32 @@ async function registerUser(req, res) {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     let user = await UserModel.findOne({ email });
     if (!user) {
-      user = await UserModel.insertOne({
+      user = await UserModel.create({
         firstName,
         lastName,
         email,
         password: hashedPassword,
       });
-      return res
-        .status(201)
-        .json(new API_RES(true, 201, "User Registered Successfully", user));
+
+      const token = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+
+      const userResponse = user.toObject();
+      delete userResponse.password;
+
+      return res.status(201).json(
+        new API_RES(true, 201, "User Registered Successfully", {
+          user: userResponse,
+          token,
+        })
+      );
     }
     return res
       .status(409)
-      .json(new API_RES(true, 409, "User already exists, please login", user));
+      .json(new API_RES(true, 409, "User already exists, please login", null));
   } catch (error) {
     return res
       .status(500)
@@ -63,7 +77,7 @@ async function loginUser(req, res) {
   try {
     const user = await UserModel.findOne({ email });
     if (!user) {
-      res
+      return res
         .status(404)
         .json(
           new API_RES(true, 404, "User not found", null, [
@@ -81,9 +95,25 @@ async function loginUser(req, res) {
           ])
         );
     }
-    return res
-      .status(200)
-      .json(new API_RES(true, 200, "Login Successfull", user, null));
+
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    return res.status(200).json(
+      new API_RES(
+        true,
+        200,
+        "Login Successfull",
+        { user: userResponse, token },
+        null
+      )
+    );
   } catch (error) {
     return res
       .status(500)

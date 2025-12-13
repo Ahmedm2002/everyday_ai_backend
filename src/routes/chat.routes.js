@@ -6,6 +6,6 @@ import {
 const router = express.Router();
 
 router.post("/prompt", generatePrompt);
-router.get("/chat/:id", chatMessages);
+router.get("/:id", chatMessages);
 
 export default router;

@@ -85,7 +85,7 @@ const generatePrompt = async function (req, res) {
 };
 
 async function chatMessages(req, res) {
-  const { chatId } = req.body.params.id;
+  const chatId = req.params.id;
   if (!chatId) {
     return res
       .status(400)
