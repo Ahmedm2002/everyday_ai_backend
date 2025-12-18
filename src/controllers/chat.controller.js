@@ -35,7 +35,7 @@ const generatePrompt = async function (req, res) {
         messages: [
           {
             user: userPrompt,
-            bot: botReply,
+            bot: botReply.choices[0].text,
           },
         ],
       });
@@ -46,7 +46,7 @@ const generatePrompt = async function (req, res) {
           $push: {
             messages: {
               user: userPrompt,
-              bot: botReply,
+              bot: botReply.choices[0].text,
             },
           },
         },
