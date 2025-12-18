@@ -8,6 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors(corsOptions));
+app.use(express.static("public"))
 
 app.use("/api", router);
 app.get('/', (req, res) => {

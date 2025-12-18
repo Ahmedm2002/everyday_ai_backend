@@ -18,15 +18,14 @@ const generatePrompt = async function (req, res) {
   }
 
   try {
-    const query = `${default_prompt} ${userPrompt}`;
+    // const query = `${default_prompt} ${userPrompt}`;
 
-    const response = await AI.models.generateContent({
-      model: "gemini-2.0-flash-001",
-      contents: query,
+    const botReply = await AI.completions.create({
+      model: "openai-community/gpt2",
+      prompt: userPrompt,
+      temperature: 0.7,
+      max_tokens: 150,
     });
-
-    const botReply = response.candidates[0].content.parts[0].text;
-    // const botReply = "Dummy response : " + Date.now();
 
     let chat;
 
@@ -70,7 +69,7 @@ const generatePrompt = async function (req, res) {
         "Bot reply generated successfully",
         {
           chatId: chat._id,
-          botReply,
+          botReply: botReply.choices[0].text,
         },
         []
       )
